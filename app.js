@@ -8,7 +8,7 @@ const startServer = async () => {
   const port = process.env.PORT || 3000
 
   createServer(await bot.createWebhook({
-    domain: 'example.com',
+    domain: process.env.WEBHOOK_DOMAIN,
     secretToken: crypto.randomBytes(64).toString('hex')
   })).listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`)

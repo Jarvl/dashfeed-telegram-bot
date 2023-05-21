@@ -2,8 +2,12 @@
   "name": "dashfeed-telegram-bot",
   "version": "0.0.1",
   "description": "Dashfeed Telegram Bot",
+  "engines": {
+    "node": "18.x"
+  },
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
