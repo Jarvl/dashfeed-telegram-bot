@@ -6,12 +6,14 @@ const { createServer } = require('http'),
 
 const startServer = async () => {
   const port = process.env.PORT || 3000
+  const webhookDomain = process.env.WEBHOOK_DOMAIN || process.env.NF_HOSTS
 
   createServer(await bot.createWebhook({
-    domain: process.env.WEBHOOK_DOMAIN,
+    domain: webhookDomain,
     secretToken: crypto.randomBytes(64).toString('hex')
   })).listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`)
+    const domain = webhookDomain || `localhost:${port}`
+    console.log(`Server running at ${domain}`)
   })
 }
 
