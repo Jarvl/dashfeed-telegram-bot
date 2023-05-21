@@ -1,0 +1,22 @@
+{
+  "name": "dashfeed-telegram-bot",
+  "version": "0.0.1",
+  "description": "Dashfeed Telegram Bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jarvl/dashfeed-telegram-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jarvl/dashfeed-telegram-bot/issues"
+  },
+  "homepage": "https://github.com/Jarvl/dashfeed-telegram-bot#readme",
+  "dependencies": {
+    "telegraf": "^4.12.2"
+  }
+}
