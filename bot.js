@@ -18,10 +18,16 @@ bot.help((ctx) => {
 })
 
 bot.command('summarize', (ctx) => {
+  const replyToMessage = ctx.message.reply_to_message
+  if (replyToMessage === undefined) {
+    ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
+  } else {
+    // TODO: reply to a message containing a URL and summarize the content
+    // TODO: schedule job on dashfeed
+    const args = { reply_to_message_id: replyToMessage.message_id }
+    ctx.reply("I ain't reading that shit. 🗿", args)
+  }
   // TODO: summarize the last x number of messages
-  // TODO: reply to a message containing a URL and summarize the content
-  ctx.reply("I ain't reading that shit. 🗿")
-  // TODO: schedule job on dashfeed
 })
 
 module.exports = bot

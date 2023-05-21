@@ -10,7 +10,8 @@ const startServer = async () => {
 
   createServer(await bot.createWebhook({
     domain: webhookDomain,
-    secretToken: crypto.randomBytes(64).toString('hex')
+    secretToken: crypto.randomBytes(64).toString('hex'),
+    allowed_updates: ['message']
   })).listen(port, () => {
     const domain = webhookDomain || `localhost:${port}`
     console.log(`Server running at ${domain}`)
