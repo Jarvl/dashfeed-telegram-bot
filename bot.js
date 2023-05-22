@@ -24,7 +24,8 @@ bot.command('summarize', async (ctx) => {
   } else {
     // TODO: schedule job on dashfeed
     const temp_contents_url = 'https://p02--dashfeed-backend-service--p9qpptgr79jf.code.run/contents/706249a6-45b3-4a30-b5c5-84644e5c73da'
-    const summary = await get(temp_contents_url).summary || "I ain't reading that shit. 🗿"
+    const contents = await get(temp_contents_url)
+    const summary = contents.summary || "I can't read. 😳"
     await ctx.reply(summary, { reply_to_message_id: replyToMessage.message_id })
   }
   // TODO: summarize the last x number of messages
