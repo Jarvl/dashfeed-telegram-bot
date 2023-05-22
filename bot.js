@@ -35,12 +35,12 @@ const registerUpdateHandlers = () => {
   bot.command('summarize', handleSummarizeCommand)
 }
 
-const createWebhookMiddleware = async () => {
+const createWebhookMiddleware = async () => (
   await bot.createWebhook({
     domain: process.env.WEBHOOK_DOMAIN || process.env.NF_HOSTS,
     secretToken: Crypto.randomBytes(64).toString('hex'),
     allowed_updates: ['message']
   })
-}
+)
 
 export { registerUpdateHandlers, createWebhookMiddleware }
