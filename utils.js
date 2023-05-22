@@ -2,7 +2,26 @@
 
 import https from 'https'
 
-export const get = (url) => (
+const transportOpts = {
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      translateTime: 'HH:MM:ss Z',
+      ignore: 'pid,hostname'
+    }
+  }
+}
+
+const envLoggerConfig = {
+  development: transportOpts,
+  production: {
+    level: 'warn',
+    ...transportOpts
+  }
+}
+
+
+const get = (url) => (
   new Promise((resolve, reject) => {
     https.get(url, res => {
       let data = []
@@ -20,3 +39,5 @@ export const get = (url) => (
     })
   })
 )
+
+export { envLoggerConfig, get }

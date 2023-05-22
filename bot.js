@@ -6,7 +6,6 @@ import { Telegraf } from 'telegraf'
 // import { message } from 'telegraf/filters'
 import { get } from './utils.js'
 
-
 const bot = new Telegraf(process.env.BOT_TOKEN)
 const botDescription =
   "I summarize things you don't want to read. " +
