@@ -6,7 +6,7 @@ import Middie from '@fastify/middie'
 import Bot from './bot.js'
 import Crypto from 'crypto'
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({ logger: false })
 await fastify.register(Middie)
 
 fastify.use(await Bot.createWebhook({
