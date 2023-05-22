@@ -7,13 +7,15 @@ import Crypto from 'crypto'
 
 const fastify = Fastify({ logger: true })
 
+console.log("secret path component", Bot.secretPathComponent())
+
 const webhook = await Bot.createWebhook({
   domain: process.env.WEBHOOK_DOMAIN || process.env.NF_HOSTS,
   secretToken: Crypto.randomBytes(64).toString('hex'),
   allowed_updates: ['message']
 })
 
-fastify.post(Bot.secretPathComponent(), (req, rep) => webhook(req.raw, rep.raw));
+fastify.post(`/${Bot.secretPathComponent()}`, (req, rep) => webhook(req.raw, rep.raw));
 fastify.get('/health', async () => ({ "succ": true }))
 
 const start = async () => {
