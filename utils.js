@@ -1,3 +1,5 @@
+'use strict'
+
 import https from 'https'
 
 export const get = (url) => (
