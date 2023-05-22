@@ -7,8 +7,8 @@ import Bot from './bot.js'
 import Crypto from 'crypto'
 
 const fastify = Fastify({ logger: true })
-
 await fastify.register(Middie)
+
 fastify.use(await Bot.createWebhook({
   domain: process.env.WEBHOOK_DOMAIN || process.env.NF_HOSTS,
   secretToken: Crypto.randomBytes(64).toString('hex'),
