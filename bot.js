@@ -1,7 +1,7 @@
 'use strict'
 
-const { Telegraf } = require('telegraf'),
-      { message } = require('telegraf/filters')
+import { Telegraf } from 'telegraf'
+// import { message } from 'telegraf/filters'
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
@@ -30,4 +30,4 @@ bot.command('summarize', (ctx) => {
   // TODO: summarize the last x number of messages
 })
 
-module.exports = bot
+export default bot
