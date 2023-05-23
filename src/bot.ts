@@ -21,16 +21,16 @@ const replyWithBotDescription = async (ctx: Context) => {
 }
 
 const handleSummarizeCommand = async (ctx: Context) => {
-  const message = ctx.message as Message.TextMessage
-  const messageText = message.text.trim()
+  const repliedToMessage = (ctx.message as Message.TextMessage).reply_to_message as Message.TextMessage
+  const repliedToMessageText = repliedToMessage.text.trim()
 
-  if (message.reply_to_message === undefined) {
+  if (repliedToMessage === undefined) {
     await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
   } else {
-    const replyArgs = { reply_to_message_id: message.reply_to_message.message_id }
-    const isUrl = isValidUrl(messageText)
-    fastify.log.info(`isUrl: ${isUrl}, messageText: ${messageText}`)
-    const contentBody = isUrl ? { url: messageText } : { text: messageText }
+    const replyArgs = { reply_to_message_id: repliedToMessage.message_id }
+    const isUrl = isValidUrl(repliedToMessageText)
+    fastify.log.info(`isUrl: ${isUrl}, messageText: ${repliedToMessageText}`)
+    const contentBody = isUrl ? { url: repliedToMessageText } : { text: repliedToMessageText }
     let createContentRes: Content
 
     try {
@@ -42,7 +42,7 @@ const handleSummarizeCommand = async (ctx: Context) => {
 
     const replyText = `Summarizing ${isUrl ? 'URL content' : 'text'}, please wait...`
     await ctx.reply(replyText, replyArgs)
-    replyWithContentSummary(ctx, message.reply_to_message.message_id, createContentRes.id)
+    replyWithContentSummary(ctx, repliedToMessage.message_id, createContentRes.id)
   }
 }
 
