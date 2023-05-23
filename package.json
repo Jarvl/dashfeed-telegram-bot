@@ -5,11 +5,9 @@
   "engines": {
     "node": "18.x"
   },
-  "type": "module",
-  "main": "app.js",
   "scripts": {
-    "start": "node server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/server",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -25,7 +23,14 @@
     "@fastify/middie": "^8.3.0",
     "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
+    "node-fetch": "^2.6.11",
     "pino-pretty": "^10.0.0",
     "telegraf": "^4.12.2"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.2",
+    "@types/node": "^20.2.3",
+    "@types/node-fetch": "^2.6.4",
+    "typescript": "^5.0.4"
   }
 }

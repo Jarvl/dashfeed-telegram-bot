@@ -3,10 +3,9 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
 import Middie from '@fastify/middie'
-import { envLoggerConfig } from './utils.js'
+import { environment, envLoggerConfig } from './utils.js'
 import { registerUpdateHandlers, createWebhookMiddleware } from './bot.js'
 
-const environment = process.env.ENV || 'production'
 const fastify = Fastify({
   logger: envLoggerConfig[environment]
 })
