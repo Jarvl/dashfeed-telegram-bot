@@ -24,9 +24,7 @@ const replyWithBotDescription = async (ctx: Context) => {
 const handleSummarizeCommand = async (ctx: Context) => {
   const repliedToMessage = (ctx.message as Message.TextMessage).reply_to_message as Message.TextMessage | undefined
 
-  if (repliedToMessage === undefined) {
-    await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
-  } else {
+  if (repliedToMessage?.text) {
     const repliedToMessageText = repliedToMessage.text.trim()
     const urls = linkify.find(repliedToMessageText, 'url').map(link => link.href)
     const isUrl = urls.length > 0
@@ -52,6 +50,8 @@ const handleSummarizeCommand = async (ctx: Context) => {
     const replyText = `Summarizing ${isUrl ? 'URL content' : 'text'}, please wait...`
     const inProgressMessage = await ctx.reply(replyText, replyArgs)
     replyWithContentSummary(ctx, repliedToMessage.message_id, createContentRes.id, inProgressMessage.message_id)
+  } else {
+    await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
   }
 }
 
