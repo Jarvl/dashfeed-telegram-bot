@@ -46,21 +46,26 @@ const handleSummarizeCommand = async (ctx: Context) => {
     }
 
     const replyText = `Summarizing ${isUrl ? 'URL content' : 'text'}, please wait...`
-    await ctx.reply(replyText, replyArgs)
-    replyWithContentSummary(ctx, repliedToMessage.message_id, createContentRes.id)
+    const inProgressMessage = await ctx.reply(replyText, replyArgs)
+    replyWithContentSummary(ctx, repliedToMessage.message_id, createContentRes.id, inProgressMessage.message_id)
   }
 }
 
-const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['message_id'], contentId: Content['id']) => {
+const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['message_id'], contentId: Content['id'], inProgressMessageId: Message['message_id']) => {
   const replyArgs = { reply_to_message_id: replyToMessageId }
 
+  const finalReply = async (text: string, interval: NodeJS.Timer) => {
+    clearInterval(interval)
+    ctx.deleteMessage(inProgressMessageId)
+    ctx.reply(text, replyArgs)
+  }
+
   let retryCount = 0
-  const interval = setInterval(() => {
+  const pollInterval = setInterval(() => {
     fastify.log.info(`retryCount: ${retryCount}, contentId: ${contentId}`)
 
     if (retryCount > 30) {
-      ctx.reply("Wow thats a lotta words too bad I'm not readin em.", replyArgs)
-      clearInterval(interval)
+      finalReply("Wow thats a lotta words too bad I'm not readin em.", pollInterval)
     }
 
     const controller = new AbortController()
@@ -69,8 +74,7 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
     getContent(contentId, signal).then(content => {
       fastify.log.info(`content: ${JSON.stringify(content)}, contentId: ${contentId}`)
       if (content.summary) {
-        ctx.reply(content.summary, replyArgs)
-        clearInterval(interval)
+        finalReply(content.summary, pollInterval)
       }
     })
     setTimeout(() => controller.abort(), 1999)
