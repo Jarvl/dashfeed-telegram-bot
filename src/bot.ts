@@ -30,12 +30,16 @@ const handleSummarizeCommand = async (ctx: Context) => {
     const replyArgs = { reply_to_message_id: repliedToMessage.message_id }
     const isUrl = isValidUrl(repliedToMessageText)
     fastify.log.info(`isUrl: ${isUrl}, messageText: ${repliedToMessageText}`)
-    const contentBody = isUrl ? { url: repliedToMessageText } : { text: repliedToMessageText }
+    // TODO: passing empty text to bypass input validation
+    const contentBody = isUrl ? { text: '', url: repliedToMessageText } : { text: repliedToMessageText }
     let createContentRes: Content
 
     try {
       createContentRes = await createContent(contentBody)
       fastify.log.info(`createContentRes: ${JSON.stringify(createContentRes)}`)
+      if (!createContentRes.id) {
+        throw new Error("No content ID")
+      }
     } catch(e) {
       await ctx.reply("I can't read. 😳", replyArgs)
       return
