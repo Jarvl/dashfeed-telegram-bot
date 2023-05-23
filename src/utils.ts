@@ -3,13 +3,42 @@ import fetch from 'node-fetch'
 
 const environment = process.env.ENV || 'production'
 
-const isValidUrl = (value: string) => {
-  try {
-    new URL(value);
-    return true;
-  } catch (err) {
-    return false;
+const setBackoffInterval = (callback: (done: () => void) => Promise<void>, maxRetries: number = 20, backoffMs: number = 1000, maxBackoffMs: number = 10000): Promise<void> => {
+  let timeoutId: NodeJS.Timeout | undefined
+  let delay = backoffMs
+  let retries = 0
+
+  const clear = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutId = undefined
+    }
   }
+
+  return new Promise((resolve, reject) => {
+    const done = () => {
+      clear()
+      resolve()
+    }
+
+    const timeoutCallback = () => {
+      if (retries >= maxRetries) {
+        clear()
+        reject()
+      } else {
+        callback(done).then(() => {
+          if (timeoutId) {
+            delay = Math.min(backoffMs, maxBackoffMs) + (1000 * Math.random())
+            backoffMs *= 1.5
+            retries++
+            timeoutId = setTimeout(timeoutCallback, delay)
+          }
+        })
+      }
+    }
+
+    timeoutId = setTimeout(timeoutCallback, delay)
+  })
 }
 
 const get = (url: string, signal?: AbortSignal) => (
@@ -56,4 +85,4 @@ const getContent = async (contentId: Content['id'], signal?: AbortSignal) => {
   return res as Content
 }
 
-export { environment, isValidUrl, Content, createContent, getContent }
+export { environment, setBackoffInterval, Content, createContent, getContent }

@@ -3,8 +3,9 @@ import Crypto from 'crypto'
 import * as linkify from 'linkifyjs';
 import { Message } from 'typegram'
 import { Telegraf, Context } from 'telegraf'
-import { isValidUrl, Content, createContent, getContent } from './utils'
+import { setBackoffInterval, Content, createContent, getContent } from './utils'
 import fastify from './fastify.js'
+import { clear } from 'console';
 
 if (process.env.BOT_TOKEN === undefined) {
   console.log('define BOT_TOKEN in env')
@@ -60,32 +61,27 @@ const handleSummarizeCommand = async (ctx: Context) => {
 const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['message_id'], contentId: Content['id'], inProgressMessageId: Message['message_id']) => {
   const replyArgs = { reply_to_message_id: replyToMessageId }
 
-  const finalReply = async (text: string, interval: NodeJS.Timer) => {
-    clearInterval(interval)
-    ctx.deleteMessage(inProgressMessageId)
-    ctx.reply(text, replyArgs)
+  const finalReply = async (text: string) => {
+    await ctx.deleteMessage(inProgressMessageId)
+    await ctx.reply(text, replyArgs)
   }
 
-  let retryCount = 0
-  const pollInterval = setInterval(() => {
-    fastify.log.info(`retryCount: ${retryCount}, contentId: ${contentId}`)
+  try {
+    await setBackoffInterval(async (done) => {
+      const controller = new AbortController()
+      const { signal } = controller
+      setTimeout(() => controller.abort(), 5000)
 
-    if (retryCount > 30) {
-      finalReply("Wow thats a lotta words too bad I'm not readin em. 🗿", pollInterval)
-    }
-
-    const controller = new AbortController()
-    const { signal } = controller
-
-    getContent(contentId, signal).then(content => {
+      const content = await getContent(contentId, signal)
       fastify.log.info(`content: ${JSON.stringify(content)}, contentId: ${contentId}`)
       if (content.summary) {
-        finalReply(content.summary, pollInterval)
+        done()
+        finalReply(content.summary)
       }
-    })
-    setTimeout(() => controller.abort(), 2999)
-    retryCount++
-  }, 3000);
+    });
+  } catch {
+    await finalReply("Wow thats a lotta words too bad I'm not readin em. 🗿")
+  }
 }
 
 const registerUpdateHandlers = () => {
