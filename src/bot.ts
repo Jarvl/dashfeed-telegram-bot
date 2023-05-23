@@ -24,7 +24,11 @@ const replyWithBotDescription = async (ctx: Context) => {
 const handleSummarizeCommand = async (ctx: Context) => {
   const repliedToMessage = (ctx.message as Message.TextMessage).reply_to_message as Message.TextMessage | undefined
 
-  if (repliedToMessage?.text) {
+  if (!repliedToMessage) {
+    await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
+  } else if (!repliedToMessage?.text) {
+    await ctx.reply("Bruh you gotta reply to a text-only message with that command. 🗿")
+  } else {
     const repliedToMessageText = repliedToMessage.text.trim()
     const urls = linkify.find(repliedToMessageText, 'url').map(link => link.href)
     const isUrl = urls.length > 0
@@ -50,8 +54,6 @@ const handleSummarizeCommand = async (ctx: Context) => {
     const replyText = `Summarizing ${isUrl ? 'URL content' : 'text'}, please wait...`
     const inProgressMessage = await ctx.reply(replyText, replyArgs)
     replyWithContentSummary(ctx, repliedToMessage.message_id, createContentRes.id, inProgressMessage.message_id)
-  } else {
-    await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
   }
 }
 
@@ -69,7 +71,7 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
     fastify.log.info(`retryCount: ${retryCount}, contentId: ${contentId}`)
 
     if (retryCount > 30) {
-      finalReply("Wow thats a lotta words too bad I'm not readin em.", pollInterval)
+      finalReply("Wow thats a lotta words too bad I'm not readin em. 🗿", pollInterval)
     }
 
     const controller = new AbortController()
