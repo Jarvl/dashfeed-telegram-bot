@@ -35,6 +35,7 @@ const handleSummarizeCommand = async (ctx: Context) => {
 
     try {
       createContentRes = await createContent(contentBody)
+      fastify.log.info(`createContentRes: ${JSON.stringify(createContentRes)}`)
     } catch(e) {
       await ctx.reply("I can't read. 😳", replyArgs)
       return
@@ -51,6 +52,8 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
 
   let retryCount = 0
   const interval = setInterval(() => {
+    fastify.log.info(`retryCount: ${retryCount}, contentId: ${contentId}`)
+
     if (retryCount > 30) {
       ctx.reply("Wow thats a lotta words too bad I'm not readin em.", replyArgs)
       clearInterval(interval)
@@ -60,14 +63,15 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
     const { signal } = controller
 
     getContent(contentId, signal).then(content => {
-      if (content.summary !== '') {
+      fastify.log.info(`content: ${JSON.stringify(content)}, contentId: ${contentId}`)
+      if (content.summary) {
         ctx.reply(content.summary, replyArgs)
         clearInterval(interval)
       }
     })
-    setTimeout(() => controller.abort(), 999)
+    setTimeout(() => controller.abort(), 1999)
     retryCount++
-  }, 1000);
+  }, 2000);
 }
 
 const registerUpdateHandlers = () => {
