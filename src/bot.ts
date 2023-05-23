@@ -3,6 +3,7 @@ import Crypto from 'crypto'
 import { Message } from 'typegram'
 import { Telegraf, Context } from 'telegraf'
 import { isValidUrl, Content, createContent, getContent } from './utils'
+import fastify from './fastify.js'
 
 if (process.env.BOT_TOKEN === undefined) {
   console.log('define BOT_TOKEN in env')
@@ -25,18 +26,22 @@ const handleSummarizeCommand = async (ctx: Context) => {
 
   if (message.reply_to_message === undefined) {
     await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
-  } else if (isValidUrl(messageText)) {
+  } else {
     const replyArgs = { reply_to_message_id: message.reply_to_message.message_id }
-
+    const isUrl = isValidUrl(messageText)
+    fastify.log.info(`isUrl: ${isUrl}, messageText: ${messageText}`)
+    const contentBody = isUrl ? { url: messageText } : { text: messageText }
     let createContentRes: Content
+
     try {
-      createContentRes = await createContent({url: messageText})
+      createContentRes = await createContent(contentBody)
     } catch(e) {
       await ctx.reply("I can't read. 😳", replyArgs)
       return
     }
 
-    await ctx.reply("Summarizing, please wait...", replyArgs)
+    const replyText = `Summarizing ${isUrl ? 'URL content' : 'text'}, please wait...`
+    await ctx.reply(replyText, replyArgs)
     replyWithContentSummary(ctx, message.reply_to_message.message_id, createContentRes.id)
   }
 }
