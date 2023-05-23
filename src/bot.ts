@@ -83,9 +83,9 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
         finalReply(content.summary, pollInterval)
       }
     })
-    setTimeout(() => controller.abort(), 1999)
+    setTimeout(() => controller.abort(), 2999)
     retryCount++
-  }, 2000);
+  }, 3000);
 }
 
 const registerUpdateHandlers = () => {
