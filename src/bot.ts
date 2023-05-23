@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import Crypto from 'crypto'
+import * as linkify from 'linkifyjs';
 import { Message } from 'typegram'
 import { Telegraf, Context } from 'telegraf'
 import { isValidUrl, Content, createContent, getContent } from './utils'
@@ -27,11 +28,14 @@ const handleSummarizeCommand = async (ctx: Context) => {
   if (repliedToMessage === undefined) {
     await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
   } else {
+    const urls = linkify.find(repliedToMessageText, 'url').map(link => link.href)
+    const isUrl = urls.length > 0
+    fastify.log.info(`urls: ${JSON.stringify(urls)}, messageText: ${repliedToMessageText}`)
+
+    // TODO: handle multiple URLs
     const replyArgs = { reply_to_message_id: repliedToMessage.message_id }
-    const isUrl = isValidUrl(repliedToMessageText)
-    fastify.log.info(`isUrl: ${isUrl}, messageText: ${repliedToMessageText}`)
     // TODO: passing empty text to bypass input validation
-    const contentBody = isUrl ? { text: '', url: repliedToMessageText } : { text: repliedToMessageText }
+    const contentBody = isUrl ? { text: '', url: urls[0] } : { text: repliedToMessageText }
     let createContentRes: Content
 
     try {
