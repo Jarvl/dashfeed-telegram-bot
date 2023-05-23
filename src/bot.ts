@@ -22,12 +22,12 @@ const replyWithBotDescription = async (ctx: Context) => {
 }
 
 const handleSummarizeCommand = async (ctx: Context) => {
-  const repliedToMessage = (ctx.message as Message.TextMessage).reply_to_message as Message.TextMessage
-  const repliedToMessageText = repliedToMessage.text.trim()
+  const repliedToMessage = (ctx.message as Message.TextMessage).reply_to_message as Message.TextMessage | undefined
 
   if (repliedToMessage === undefined) {
     await ctx.reply("Bruh you gotta reply to a message with that command. 🗿")
   } else {
+    const repliedToMessageText = repliedToMessage.text.trim()
     const urls = linkify.find(repliedToMessageText, 'url').map(link => link.href)
     const isUrl = urls.length > 0
     fastify.log.info(`urls: ${JSON.stringify(urls)}, messageText: ${repliedToMessageText}`)
