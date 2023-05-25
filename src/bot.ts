@@ -66,14 +66,15 @@ const handleSummarizeCommand = async (ctx: Context) => {
 
 const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['message_id'], contentId: Content['id'], inProgressMessageId: Message['message_id']) => {
   const finalReply = async (text: string, id?: string) => {
-    ctx.deleteMessage(inProgressMessageId)
-    ctx.reply(text, {
-      reply_to_message_id: replyToMessageId,
-      ...Markup.inlineKeyboard([
-        Markup.button.callback('👍', `${id}_upvote`),
-        Markup.button.callback('👎', `${id}_downvote`)
-      ])
-    })
+    const deleteMessage = ctx.deleteMessage(inProgressMessageId)
+    const inlineKeyboard = id
+      ? Markup.inlineKeyboard([
+          Markup.button.callback('👍', `${id}_upvote`),
+          Markup.button.callback('👎', `${id}_downvote`)
+        ])
+      : {}
+    const reply = ctx.reply(text, { reply_to_message_id: replyToMessageId, ...inlineKeyboard })
+    await deleteMessage, reply
   }
 
   try {
@@ -86,7 +87,7 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
       fastify.log.info(`content: ${JSON.stringify(content)}, contentId: ${contentId}`)
       if (content.summary) {
         done()
-        finalReply(content.id, content.summary)
+        await finalReply(content.summary, content.id)
       }
     });
   } catch {
