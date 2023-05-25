@@ -1,9 +1,16 @@
 import 'dotenv/config'
 import Crypto from 'crypto'
 import * as linkify from 'linkifyjs';
-import { Message } from 'typegram'
 import { Telegraf, Context, Markup } from 'telegraf'
-import { setBackoffInterval, Content, createContent, getContent } from './utils'
+import { callbackQuery } from 'telegraf/filters'
+import { Message } from 'telegraf/typings/core/types/typegram'
+import {
+  setBackoffInterval,
+  Content,
+  createContent,
+  getContent,
+  submitContentVote
+} from './utils'
 import fastify from './fastify.js'
 
 if (process.env.BOT_TOKEN === undefined) {
@@ -58,13 +65,13 @@ const handleSummarizeCommand = async (ctx: Context) => {
 }
 
 const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['message_id'], contentId: Content['id'], inProgressMessageId: Message['message_id']) => {
-  const finalReply = async (text: string) => {
+  const finalReply = async (text: string, id?: string) => {
     ctx.deleteMessage(inProgressMessageId)
     ctx.reply(text, {
       reply_to_message_id: replyToMessageId,
       ...Markup.inlineKeyboard([
-        Markup.button.callback('👍', 'upvote'),
-        Markup.button.callback('👎', 'downvote'),
+        Markup.button.callback('👍', `${id}_upvote`),
+        Markup.button.callback('👎', `${id}_downvote`)
       ])
     })
   }
@@ -79,7 +86,7 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
       fastify.log.info(`content: ${JSON.stringify(content)}, contentId: ${contentId}`)
       if (content.summary) {
         done()
-        finalReply(content.summary)
+        finalReply(content.id, content.summary)
       }
     });
   } catch {
@@ -91,8 +98,14 @@ const registerUpdateHandlers = () => {
   bot.start(replyWithBotDescription)
   bot.help(replyWithBotDescription)
   bot.command('summary', handleSummarizeCommand)
-  bot.on('callback_query', (ctx) => {
-
+  bot.on(callbackQuery('data'), async (ctx) => {
+    const [contentId, vote] = ctx.callbackQuery.data.split('_')
+    if (['downvote', 'upvote'].includes(vote)) {
+      fastify.log.info(`Vote submitted callback_query_data=${ctx.callbackQuery.data}`)
+      await submitContentVote(contentId, vote)
+    } else {
+      fastify.log.warn(`Improper vote callback_query_data=${ctx.callbackQuery.data}`)
+    }
   })
 }
 
@@ -106,7 +119,7 @@ const createWebhookMiddleware = async () => {
   return await bot.createWebhook({
     domain: webhookUrl,
     secret_token: Crypto.randomBytes(64).toString('hex'),
-    allowed_updates: ['message']
+    allowed_updates: ['message', 'callback_query']
   })
 }
 

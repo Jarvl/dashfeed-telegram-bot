@@ -52,11 +52,13 @@ const get = (url: string, signal?: AbortSignal) => (
   })
 )
 
-const post = async (url: string, body: object, signal?: AbortSignal) => (
+type RequestMethod = 'POST' | 'PUT'
+
+const request = async (method: RequestMethod, url: string, body?: object, signal?: AbortSignal) => (
   new Promise<object>((resolve, reject) => {
     fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(body),
+      method: method,
+      body: body && JSON.stringify(body) || undefined,
       headers: { 'Content-Type': 'application/json' },
       signal
     })
@@ -68,6 +70,14 @@ const post = async (url: string, body: object, signal?: AbortSignal) => (
   })
 )
 
+const post = async (url: string, body?: object, signal?: AbortSignal) => (
+  await request('POST', url, body, signal)
+)
+
+const put = async (url: string, body?: object, signal?: AbortSignal) => (
+  await request('PUT', url, body, signal)
+)
+
 const contentsUrl = `${process.env.DASHFEED_API_URL}/contents`
 
 interface Content {
@@ -76,13 +86,22 @@ interface Content {
 }
 
 const createContent = async (body: object, signal?: AbortSignal) => {
-  const res = await post(contentsUrl, body, signal)
-  return res as Content
+  return (await post(contentsUrl, body, signal) as Content)
 }
 
 const getContent = async (contentId: Content['id'], signal?: AbortSignal) => {
-  const res = await get(`${contentsUrl}/${contentId}`, signal)
-  return res as Content
+  return (await get(`${contentsUrl}/${contentId}`, signal) as Content)
 }
 
-export { environment, setBackoffInterval, Content, createContent, getContent }
+const submitContentVote = async (contentId: Content['id'], vote: string) => {
+  return (await put(`${contentsUrl}/${contentId}/${vote}`) as Content)
+}
+
+export {
+  environment,
+  setBackoffInterval,
+  Content,
+  createContent,
+  getContent,
+  submitContentVote
+}
