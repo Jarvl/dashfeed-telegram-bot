@@ -104,6 +104,7 @@ const registerUpdateHandlers = () => {
     if (['downvote', 'upvote'].includes(vote)) {
       fastify.log.info(`Vote submitted callback_query_data=${ctx.callbackQuery.data}`)
       await submitContentVote(contentId, vote)
+      await ctx.answerCbQuery('Feedback submitted')
     } else {
       fastify.log.warn(`Improper vote callback_query_data=${ctx.callbackQuery.data}`)
     }
