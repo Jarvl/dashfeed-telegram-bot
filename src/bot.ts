@@ -21,7 +21,7 @@ if (process.env.BOT_TOKEN === undefined) {
 const bot = new Telegraf(process.env.BOT_TOKEN)
 const botDescription =
   "I summarize things you don't want to read. " +
-  "Reply to a message with /summarize and I'll send a DashFeed-powered summary of the message " +
+  "Reply to a message with /summary and I'll send a DashFeed-powered summary of the message " +
   "or the linked content in the message."
 
 const replyWithBotDescription = async (ctx: Context) => {
