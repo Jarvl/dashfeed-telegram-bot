@@ -2,10 +2,9 @@ import 'dotenv/config'
 import Crypto from 'crypto'
 import * as linkify from 'linkifyjs';
 import { Message } from 'typegram'
-import { Telegraf, Context } from 'telegraf'
+import { Telegraf, Context, Markup } from 'telegraf'
 import { setBackoffInterval, Content, createContent, getContent } from './utils'
 import fastify from './fastify.js'
-import { clear } from 'console';
 
 if (process.env.BOT_TOKEN === undefined) {
   console.log('define BOT_TOKEN in env')
@@ -59,11 +58,15 @@ const handleSummarizeCommand = async (ctx: Context) => {
 }
 
 const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['message_id'], contentId: Content['id'], inProgressMessageId: Message['message_id']) => {
-  const replyArgs = { reply_to_message_id: replyToMessageId }
-
   const finalReply = async (text: string) => {
-    await ctx.deleteMessage(inProgressMessageId)
-    await ctx.reply(text, replyArgs)
+    ctx.deleteMessage(inProgressMessageId)
+    ctx.reply(text, {
+      reply_to_message_id: replyToMessageId,
+      ...Markup.inlineKeyboard([
+        Markup.button.callback('👍', 'upvote'),
+        Markup.button.callback('👎', 'downvote'),
+      ])
+    })
   }
 
   try {
@@ -88,6 +91,9 @@ const registerUpdateHandlers = () => {
   bot.start(replyWithBotDescription)
   bot.help(replyWithBotDescription)
   bot.command('summarize', handleSummarizeCommand)
+  bot.on('callback_query', (ctx) => {
+    
+  })
 }
 
 const createWebhookMiddleware = async () => {
