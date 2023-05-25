@@ -90,9 +90,9 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
 const registerUpdateHandlers = () => {
   bot.start(replyWithBotDescription)
   bot.help(replyWithBotDescription)
-  bot.command('summarize', handleSummarizeCommand)
+  bot.command('summary', handleSummarizeCommand)
   bot.on('callback_query', (ctx) => {
-    
+
   })
 }
 
