@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import fetch from 'node-fetch'
 
+const lineBreakRegex = /\r\n|\r|\n/
 const environment = process.env.ENV || 'production'
 
 const setBackoffInterval = (callback: (done: () => void) => Promise<void>, maxRetries: number = 20, backoffMs: number = 1000, maxBackoffMs: number = 10000): Promise<void> => {
@@ -98,6 +99,7 @@ const submitContentVote = async (contentId: Content['id'], vote: string) => {
 }
 
 export {
+  lineBreakRegex,
   environment,
   setBackoffInterval,
   Content,

@@ -1,10 +1,11 @@
 import 'dotenv/config'
 import Crypto from 'crypto'
-import * as linkify from 'linkifyjs';
+import * as linkify from 'linkifyjs'
 import { Telegraf, Context, Markup } from 'telegraf'
 import { callbackQuery } from 'telegraf/filters'
 import { Message } from 'telegraf/typings/core/types/typegram'
 import {
+  lineBreakRegex,
   setBackoffInterval,
   Content,
   createContent,
@@ -17,6 +18,8 @@ if (process.env.BOT_TOKEN === undefined) {
   console.log('define BOT_TOKEN in env')
   process.exit(1)
 }
+
+const voteDelimiter = '------'
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 const botDescription =
@@ -73,7 +76,10 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
           Markup.button.callback('👎', `${id}_downvote`)
         ])
       : {}
-    const reply = ctx.reply(text, { reply_to_message_id: replyToMessageId, ...inlineKeyboard })
+    const reply = ctx.reply(text, {
+      parse_mode: 'MarkdownV2',
+      reply_to_message_id: replyToMessageId, ...inlineKeyboard
+    })
     await deleteMessage, reply
   }
 
@@ -89,9 +95,20 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
         done()
         await finalReply(content.summary, content.id)
       }
-    });
+    })
   } catch {
     await finalReply("Wow thats a lotta words too bad I'm not readin em. 🗿")
+  }
+}
+
+const buildVotesMarkdown = async (messageText: string) => {
+  if (messageText.includes(voteDelimiter)) {
+    const [originalMessageText, votesText] = messageText.split(voteDelimiter)
+    if (votesText) {
+      
+    }
+  } else {
+
   }
 }
 
