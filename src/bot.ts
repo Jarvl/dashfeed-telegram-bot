@@ -81,6 +81,7 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
       reply_to_message_id: replyToMessageId, ...inlineKeyboard
     })
     await deleteMessage, reply
+    fastify.log.info(`Reply sent message_id=${(await reply).message_id}`)
   }
 
   try {
