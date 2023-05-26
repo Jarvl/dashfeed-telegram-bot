@@ -19,6 +19,8 @@ if (process.env.BOT_TOKEN === undefined) {
   process.exit(1)
 }
 
+const upvote = 'upvote'
+const downvote = 'downvote'
 const voteDelimiter = '------'
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
@@ -72,12 +74,12 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
     const deleteMessage = ctx.deleteMessage(inProgressMessageId)
     const inlineKeyboard = id
       ? Markup.inlineKeyboard([
-          Markup.button.callback('👍', `${id}_upvote`),
-          Markup.button.callback('👎', `${id}_downvote`)
+          Markup.button.callback('👍', `${id}_${upvote}`),
+          Markup.button.callback('👎', `${id}_${downvote}`)
         ])
       : {}
     const reply = ctx.reply(text, {
-      parse_mode: 'MarkdownV2',
+      // parse_mode: 'MarkdownV2',
       reply_to_message_id: replyToMessageId, ...inlineKeyboard
     })
     await deleteMessage, reply
