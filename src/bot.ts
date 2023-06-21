@@ -74,8 +74,8 @@ const replyWithContentSummary = async (ctx: Context, replyToMessageId: Message['
     const deleteMessage = ctx.deleteMessage(inProgressMessageId)
     const inlineKeyboard = id
       ? Markup.inlineKeyboard([
-          Markup.button.callback('👍', `${id}_${upvote}`),
-          Markup.button.callback('👎', `${id}_${downvote}`)
+          Markup.button.callback('Let him cook 👍', `${id}_${upvote}`),
+          Markup.button.callback('Cap 👎', `${id}_${downvote}`)
         ])
       : {}
     const reply = ctx.reply(text, {
