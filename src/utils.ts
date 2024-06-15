@@ -4,7 +4,7 @@ import fetch from 'node-fetch'
 const lineBreakRegex = /\r\n|\r|\n/
 const environment = process.env.ENV || 'production'
 
-const setBackoffInterval = (callback: (done: () => void) => Promise<void>, maxRetries: number = 20, backoffMs: number = 1000, maxBackoffMs: number = 10000): Promise<void> => {
+const setBackoffInterval = (callback: (done: () => void) => Promise<void>, maxRetries: number = 50, backoffMs: number = 1000, maxBackoffMs: number = 10000): Promise<void> => {
   let timeoutId: NodeJS.Timeout | undefined
   let delay = backoffMs
   let retries = 0
